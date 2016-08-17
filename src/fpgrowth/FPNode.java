@@ -28,6 +28,14 @@ public class FPNode {
 		return "FPNode [support=" + support + ", itemName=" + itemName + "]";
 	}
 	
+	public void attach(FPNode t){
+		FPNode node = this;
+		while(node.next!=null){
+			node = node.next;
+		}
+		node.next = t;
+	}
+	
 	
 }
 
