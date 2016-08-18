@@ -7,14 +7,9 @@ public class FPNode {
 	int support;
 	String itemName;
 	HashMap<String, FPNode> children;
-	boolean isLeaf;
 	FPNode next; //use for header table
 	FPNode parent;
 	
-//	public FPNode(){
-//		this.children =  new HashMap<String, FPNode>();
-//		this.next = null;
-//	}
 	public FPNode(String name) {
 		this.itemName = name;
 		this.support = 1;

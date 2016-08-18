@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -19,20 +18,20 @@ import java.util.regex.Pattern;
 
 
 /**
+ * FP-Growth Procedure
  * 
  * @author Yue Shang
- * 
- * 
  *
  */
 public class FPGrow {
 	FPNode root;
-	int min_sup = 5;
+	int min_sup = 10000;
 	private Map<List<String>, Integer> frequentMap = new HashMap<List<String>, Integer>();
 	
 	public void FPGrowthAlgorithm(List<List<String>> transactions){
+		//-- This is the first Data Scan
 		HashMap<String, Integer> itemCount = getFreqCount(transactions);
-		
+		System.out.println("Finish 1st Data Scan....");
 		//Sort items according to itemCount
 		for(List<String> transaction: transactions){
 			Collections.sort(transaction, new Comparator<String>() {
@@ -51,21 +50,6 @@ public class FPGrow {
 	}
 	
 	
-	
-	public void getCombinations(ArrayList<FPNode> path, List<List<FPNode>> combinations){
-		if(path==null || path.size()==0)return;
-		int length = path.size();
-		for(int i = 1;i<Math.pow(2, length);i++){
-			String bitmap = Integer.toBinaryString(i);
-			List<FPNode> combine = new ArrayList<>();
-			for(int j = 0;j<bitmap.length();j++){
-				if(bitmap.charAt(j)=='1'){
-					combine.add(path.get(length-bitmap.length()+j));
-				}
-			}
-			combinations.add(combine);
-		}
-	}
 	
 	
 	/**
@@ -165,7 +149,28 @@ public class FPGrow {
 		}
 	}
 	
-	public FPNode buildTree(List<List<String>> transactions, final Map<String, Integer> itemCount, final Map<String, FPNode> headerTable){
+	/**
+	 * Generate all the possible combinations for a given item set. Use bitmap
+	 * @param path
+	 * @param combinations
+	 */
+	private void getCombinations(ArrayList<FPNode> path, List<List<FPNode>> combinations){
+		if(path==null || path.size()==0)return;
+		int length = path.size();
+		for(int i = 1;i<Math.pow(2, length);i++){
+			String bitmap = Integer.toBinaryString(i);
+			List<FPNode> combine = new ArrayList<>();
+			for(int j = 0;j<bitmap.length();j++){
+				if(bitmap.charAt(j)=='1'){
+					combine.add(path.get(length-bitmap.length()+j));
+				}
+			}
+			combinations.add(combine);
+		}
+	}
+	
+	
+	private FPNode buildTree(List<List<String>> transactions, final Map<String, Integer> itemCount, final Map<String, FPNode> headerTable){
 		FPNode root = new FPNode("ROOT");
 		root.parent = null;
 		
@@ -192,7 +197,6 @@ public class FPGrow {
 					if(header!=null){
 						header.attach(t);
 					}
-					
 				}
 				prev = t;
 				children = t.children;
@@ -235,7 +239,13 @@ public class FPGrow {
 		return itemCount;
 	}
 	
-	public List<List<String>> loadTransactions(String filename) throws IOException{
+	/**
+	 * Load census data
+	 * @param filename
+	 * @return
+	 * @throws IOException
+	 */
+	private List<List<String>> loadTransactions(String filename) throws IOException{
 		BufferedReader br = new BufferedReader(new FileReader(new File(filename)));
 		List<List<String>> transactions = new ArrayList<>();
 		
@@ -257,22 +267,6 @@ public class FPGrow {
 	
 	
 	
-	
-	public void printFPTree(FPNode node, int level){
-		if(node!=null){
-			System.out.print(node.itemName+"\tlevel="+level+"  parent=");
-		}
-		if(node.parent!=null)System.out.println(node.parent.itemName);
-		else System.out.println("NULL");
-		if(node.children==null)System.out.println(" --LEAF");
-		Iterator<String> it = node.children.keySet().iterator();
-		while(it.hasNext()){
-			String name = it.next();
-			FPNode nextNode= node.children.get(name);
-			
-			printFPTree(nextNode,++level);
-		}
-	}
 	
 	
 	
@@ -313,7 +307,7 @@ public class FPGrow {
 
 	
 	public static void main(String[] args) throws IOException {
-		String infile = "./data/census-sample20.dat";
+		String infile = "C:\\Users\\y80048376\\Downloads\\census.dat";
 		FPGrow model = new FPGrow();
 		List<List<String>> transactions = model.loadTransactions(infile);
 		model.FPGrowthAlgorithm(transactions);
