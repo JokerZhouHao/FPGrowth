@@ -307,10 +307,16 @@ public class FPGrow {
 
 	
 	public static void main(String[] args) throws IOException {
-		String infile = "C:\\Users\\y80048376\\Downloads\\census.dat";
+		String infile = args[0];
 		FPGrow model = new FPGrow();
+		
+		//Load data from text file into List
 		List<List<String>> transactions = model.loadTransactions(infile);
+		
+		//
 		model.FPGrowthAlgorithm(transactions);
+		
+		//Set the default length of frequent items set >=2 
 		model.printResult(2);
 	}
 }
